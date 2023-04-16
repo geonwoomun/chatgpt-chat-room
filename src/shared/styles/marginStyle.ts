@@ -1,13 +1,33 @@
 import { css } from '@emotion/react';
 
-export const createMarginCss = ({ y, x }: { y?: number; x?: number }) => css`
-  ${y &&
+export const createMarginCss = ({
+  top,
+  bottom,
+  right,
+  left,
+}: {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+}) => css`
+  ${top &&
   css`
-    margin-bottom: ${y}px;
+    margin-top: ${top}px;
   `}
 
-  ${x &&
+  ${bottom &&
   css`
-    margin-right: ${x}px;
+    margin-bottom: ${bottom}px;
+  `}
+
+  ${left &&
+  css`
+    margin-left: ${left}px;
+  `}
+
+  ${right &&
+  css`
+    margin-right: ${right}px;
   `}
 `;
