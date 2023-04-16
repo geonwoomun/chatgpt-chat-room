@@ -12,6 +12,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     res.status(200).json({ text: response.data.choices[0].text || 'error' });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Internal Server Error');
+    res.status(500).send({ text: 'Internal Server Error' });
   }
 }
