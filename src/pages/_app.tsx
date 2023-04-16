@@ -4,8 +4,20 @@ import { ChakraProvider } from '@chakra-ui/react';
 import Head from 'next/head';
 import styled from '@emotion/styled';
 import GlobalStyles from '@/shared/styles/GlobalStyles';
+import { NextPage } from 'next';
+import { ReactElement, ReactNode } from 'react';
 
-export default function App({ Component, pageProps }: AppProps) {
+export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+  getLayout?: (page: ReactElement) => ReactNode;
+};
+
+type AppPropsWithLayout = AppProps & {
+  Component: NextPageWithLayout;
+};
+
+export default function App({ Component, pageProps }: AppPropsWithLayout) {
+  const getLayout = Component.getLayout || ((page) => page);
+
   return (
     <ChakraProvider>
       <Head>
@@ -15,14 +27,12 @@ export default function App({ Component, pageProps }: AppProps) {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <GlobalStyles />
-      <GlobalLayout>
-        <Component {...pageProps} />
-      </GlobalLayout>
+      <GlobalLayout>{getLayout(<Component {...pageProps} />)}</GlobalLayout>
     </ChakraProvider>
   );
 }
 
-const GlobalLayout = styled.main`
+const GlobalLayout = styled.section`
   max-width: 428px;
   width: 100%;
   height: 100%;
