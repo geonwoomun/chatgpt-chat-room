@@ -1,29 +1,38 @@
-import React from 'react';
+import React, { useEffect, useId } from 'react';
 import { Input, Button } from '@chakra-ui/react';
-import useInputChange from '@/shared/hooks/useInputChange';
 import styled from '@emotion/styled';
 import { createMarginCss } from '@/shared/styles/marginStyle';
+import OpenAiInstance from '@/shared/api/openApi';
+import { useRouter } from 'next/router';
 
 const Settings = () => {
-  const [value, handleChange] = useInputChange('');
+  const inputId = useId();
+  const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // ToDo: ChatGPT API Check 로직 있으면 체크,
-    // 그 후 chat 페이지로 보내기
+    if (!(event.target instanceof HTMLFormElement)) {
+      return;
+    }
+
+    const inputValue = event.target[`${inputId}-api-key`].value;
+    OpenAiInstance.setInstance(inputValue);
+
+    router.push('/');
   };
 
   return (
     <SettingsContainer>
       <form onSubmit={handleSubmit}>
         <Input
-          css={createMarginCss({ y: 20 })}
-          value={value}
-          onChange={handleChange}
+          id={`${inputId}-api-key`}
+          css={createMarginCss({ bottom: 20 })}
           placeholder='Input your ChatGPT Api Key'
         />
-        <Button colorScheme='blue'>Submit</Button>
+        <Button type='submit' colorScheme='blue'>
+          Submit
+        </Button>
       </form>
     </SettingsContainer>
   );
