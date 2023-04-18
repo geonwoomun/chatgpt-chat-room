@@ -21,9 +21,9 @@ const ChatInput = ({ className, onSend }: ChatInputProps) => {
   return (
     <Container className={className}>
       <InputGroup>
-        <Input ref={ref} placeholder='type user think' size='lg' />
-        <InputRightElement>
-          <IconButton aria-label='send' icon={<AiOutlineSend />} onClick={handleClickSend} />
+        <Input ref={ref} placeholder='type user think' size='lg' focusBorderColor='#E2E8F0' />
+        <InputRightElement height='12'>
+          <IconButton size='sm' aria-label='send' icon={<AiOutlineSend />} onClick={handleClickSend} />
         </InputRightElement>
       </InputGroup>
     </Container>
