@@ -2,7 +2,7 @@ import { createMarginCss } from '@/shared/styles/marginStyle';
 import { Flex } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import ChatInput from './components/ChatInput';
 import ChatMessage from './components/ChatMessage';
 
@@ -94,6 +94,7 @@ const dummyMessages = [
 ];
 
 const ChatRoom = () => {
+  const chatListRef = useRef<HTMLDivElement>(null);
   // 채팅방 아이디
   // 해당 채팅방 아이디에 맞는 채팅방 메시지 정보를 불러오기
   const profile = 'gzgz';
@@ -102,9 +103,17 @@ const ChatRoom = () => {
     console.log(value);
   };
 
+  useEffect(() => {
+    if (!chatListRef.current) {
+      return;
+    }
+
+    chatListRef.current.scrollTo({ top: chatListRef.current.scrollHeight, behavior: 'auto' });
+  }, []);
+
   return (
     <>
-      <StyledFlex flexDirection='column'>
+      <StyledFlex flexDirection='column' ref={chatListRef}>
         {dummyMessages.map((messageInfo) => (
           <PositionChatMessage
             key={messageInfo.id}

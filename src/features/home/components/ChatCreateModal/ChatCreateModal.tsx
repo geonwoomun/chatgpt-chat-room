@@ -1,3 +1,4 @@
+import { createMarginCss } from '@/shared/styles/marginStyle';
 import {
   Button,
   Input,
@@ -25,7 +26,7 @@ const ChatCreateModal = ({ isOpen, onClose }: ChatCreateModalProps) => {
         <ModalHeader>방 생성하기</ModalHeader>
         <ModalCloseButton />
         <ModalBody>
-          <Input minLength={2} maxLength={10} placeholder='Room Name' />
+          <Input css={createMarginCss({ bottom: 16 })} minLength={2} maxLength={10} placeholder='Room Name' />
 
           <Input type='number' min={2} max={5} placeholder='Room Occupancy' />
         </ModalBody>
