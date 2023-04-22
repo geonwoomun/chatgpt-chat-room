@@ -1,3 +1,4 @@
+import { RoomModel } from '@/shared/types/schema';
 import { Flex } from '@chakra-ui/react';
 import styled from '@emotion/styled';
 import React from 'react';
@@ -5,14 +6,14 @@ import ChatItemPopover from '../ChatItemPopover';
 import ChatListItem from '../ChatListItem';
 
 type ChatListProps = {
-  items: { chatId: string; title: string; userCount: number }[];
+  items: RoomModel[];
 };
 
 const ChatList = ({ items }: ChatListProps) => {
   return (
     <CustomFlexContainer direction='column'>
       {items.map((item) => (
-        <ChatListItem key={item.chatId} {...item} rightComponent={<ChatItemPopover />} />
+        <ChatListItem key={item.roomId} {...item} rightComponent={<ChatItemPopover />} />
       ))}
     </CustomFlexContainer>
   );

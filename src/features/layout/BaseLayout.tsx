@@ -1,3 +1,7 @@
+import OpenAiInstance from '@/shared/api/openApi';
+import { useIndexedDBStore } from '@/shared/hooks/indexedDB';
+import { useRoomsState } from '@/shared/modules/RoomsContext';
+import { BaseRoomModel, CreateRoomModel } from '@/shared/types/schema';
 import { AddIcon } from '@chakra-ui/icons';
 import { Container, IconButton, useDisclosure } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
@@ -11,9 +15,23 @@ type BaseLayoutProps = {};
 const BaseLayout = ({ children }: PropsWithChildren<BaseLayoutProps>) => {
   const router = useRouter();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { add } = useIndexedDBStore<CreateRoomModel>('rooms');
+  const [, setRooms] = useRoomsState();
 
   const handleClickLogo = () => {
     router.push('/');
+  };
+
+  const handleConfirm = async ({ name, occupancy }: BaseRoomModel) => {
+    if (!OpenAiInstance.apiKey) {
+      return;
+    }
+
+    const nextRoom = { name, occupancy, apiKey: OpenAiInstance.apiKey };
+
+    const createdRoomId = await add(nextRoom);
+
+    setRooms((prev) => [...prev, { roomId: createdRoomId, ...nextRoom }]);
   };
 
   return (
@@ -27,7 +45,7 @@ const BaseLayout = ({ children }: PropsWithChildren<BaseLayoutProps>) => {
         {children}
       </Container>
 
-      <ChatCreateModal isOpen={isOpen} onClose={onClose} />
+      <ChatCreateModal isOpen={isOpen} onClose={onClose} onConfirm={handleConfirm} />
     </>
   );
 };

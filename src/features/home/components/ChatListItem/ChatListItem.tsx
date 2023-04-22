@@ -1,21 +1,18 @@
 import { createMarginCss } from '@/shared/styles/marginStyle';
-import { Flex, IconButton, Icon, Text } from '@chakra-ui/react';
+import { RoomModel } from '@/shared/types/schema';
+import { Flex, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
-import { AiOutlineMore } from 'react-icons/ai';
 
 type ChatListProps = {
-  chatId: string;
-  title: string;
-  userCount: number;
   rightComponent?: ReactNode;
-};
+} & RoomModel;
 
-const ChatListItem = ({ chatId, title, userCount, rightComponent }: ChatListProps) => {
+const ChatListItem = ({ name, occupancy, roomId, rightComponent }: ChatListProps) => {
   const router = useRouter();
 
   const handleClickListItem = () => {
-    router.push(`/chat/${chatId}`);
+    router.push(`/chat/${roomId}`);
   };
 
   return (
@@ -27,9 +24,9 @@ const ChatListItem = ({ chatId, title, userCount, rightComponent }: ChatListProp
         onClick={handleClickListItem}
         css={createMarginCss({ right: 8 })}
       >
-        <Text fontSize='xl'>{title}</Text>
+        <Text fontSize='xl'>{name}</Text>
         <Text fontSize='sm' color='gray'>
-          인원수: {userCount}명
+          인원수: {occupancy}명
         </Text>
       </Flex>
 
