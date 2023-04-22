@@ -1,10 +1,16 @@
 import { Configuration, OpenAIApi } from 'openai';
 
 class OpenAI {
+  private _apiKey: string | null;
   private openAI: OpenAIApi | null;
 
   constructor() {
     this.openAI = null;
+    this._apiKey = null;
+  }
+
+  get apiKey() {
+    return this._apiKey;
   }
 
   setInstance(apiKey: string) {
@@ -13,6 +19,7 @@ class OpenAI {
       apiKey: apiKey,
     });
 
+    this._apiKey = apiKey;
     this.openAI = new OpenAIApi(configuration);
   }
 

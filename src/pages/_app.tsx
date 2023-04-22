@@ -5,7 +5,10 @@ import Head from 'next/head';
 import styled from '@emotion/styled';
 import GlobalStyles from '@/shared/styles/GlobalStyles';
 import { NextPage } from 'next';
-import { ReactElement, ReactNode } from 'react';
+import { ReactElement, ReactNode, useEffect } from 'react';
+import setupIndexedDB from '@/shared/hooks/indexedDB';
+import { idbConfig } from '@/shared/config/dbConfig';
+import { RoomsProvider } from '@/shared/modules/RoomsContext';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -18,6 +21,12 @@ type AppPropsWithLayout = AppProps & {
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page) => page);
 
+  useEffect(() => {
+    setupIndexedDB(idbConfig)
+      .then(() => console.log('success'))
+      .catch((e) => console.error('error / unsupported', e));
+  }, []);
+
   return (
     <ChakraProvider>
       <Head>
@@ -26,8 +35,10 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
         <meta name='viewport' content='width=device-width, initial-scale=1' />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <GlobalStyles />
-      <GlobalLayout>{getLayout(<Component {...pageProps} />)}</GlobalLayout>
+      <RoomsProvider>
+        <GlobalStyles />
+        <GlobalLayout>{getLayout(<Component {...pageProps} />)}</GlobalLayout>
+      </RoomsProvider>
     </ChakraProvider>
   );
 }
