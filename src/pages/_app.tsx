@@ -9,6 +9,8 @@ import { ReactElement, ReactNode, useEffect } from 'react';
 import setupIndexedDB from '@/shared/hooks/indexedDB';
 import { idbConfig } from '@/shared/config/dbConfig';
 import { RoomsProvider } from '@/shared/modules/RoomsContext';
+import { useRouter } from 'next/router';
+import OpenAiInstance from '@/shared/api/openApi';
 
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
@@ -20,11 +22,18 @@ type AppPropsWithLayout = AppProps & {
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout = Component.getLayout || ((page) => page);
+  const router = useRouter();
 
   useEffect(() => {
     setupIndexedDB(idbConfig)
       .then(() => console.log('success'))
       .catch((e) => console.error('error / unsupported', e));
+  }, []);
+
+  useEffect(() => {
+    if (!OpenAiInstance.apiKey) {
+      router.push('/settings');
+    }
   }, []);
 
   return (
