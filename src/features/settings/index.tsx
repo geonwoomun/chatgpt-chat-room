@@ -7,6 +7,7 @@ import { useRouter } from 'next/router';
 import { useIndexedDBStore } from '../../shared/hooks/indexedDB';
 import { ApiKeyModel } from '@/shared/types/schema';
 import Text from '@/shared/components/Text';
+import { error } from 'console';
 
 const Settings = () => {
   const inputId = useId();
@@ -24,9 +25,13 @@ const Settings = () => {
 
     const inputValue = event.target[`${inputId}-api-key`].value;
     OpenAiInstance.setInstance(inputValue);
-    add({ apiKey: inputValue });
-
-    router.push('/');
+    add({ apiKey: inputValue })
+      .then(() => {
+        router.push('/');
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
   };
 
   const handleSelectApiKey = (selectedApiKey: string) => {
