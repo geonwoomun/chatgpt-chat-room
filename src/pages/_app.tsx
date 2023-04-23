@@ -25,9 +25,15 @@ export default function App({ Component, pageProps }: AppPropsWithLayout) {
   const router = useRouter();
 
   useEffect(() => {
-    setupIndexedDB(idbConfig)
-      .then(() => console.log('success'))
-      .catch((e) => console.error('error / unsupported', e));
+    const settingIndexedDB = () => {
+      setupIndexedDB(idbConfig)
+        .then(() => console.log('success'))
+        .catch((e) => {
+          console.error('error / unsupported', e);
+          settingIndexedDB();
+        });
+    };
+    settingIndexedDB();
   }, []);
 
   useEffect(() => {
