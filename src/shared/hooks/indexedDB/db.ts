@@ -44,8 +44,6 @@ export async function getConnection(config?: IndexedDBConfig): Promise<IDBDataba
       const request: IDBOpenDBRequest = idbInstance.open(_config?.databaseName || '', _config?.version);
 
       request.onsuccess = () => {
-        console.log('여기실행2');
-
         resolve(request.result);
       };
 
@@ -136,14 +134,13 @@ export function getActions<T>(currentStore) {
       });
     },
 
-    add(value: T, key?: any) {
+    add(value: Omit<T, 'id'>, key?: any) {
       return new Promise<number>((resolve, reject) => {
         getConnection()
           .then((db) => {
             validateBeforeTransaction(db, currentStore, reject);
             let tx = createTransaction(db, 'readwrite', currentStore, resolve, reject);
             let objectStore = tx.objectStore(currentStore);
-            console.log(objectStore);
             let request = objectStore.add(value);
             request.onsuccess = (e: any) => {
               (tx as any)?.commit?.();

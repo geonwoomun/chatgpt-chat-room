@@ -22,6 +22,7 @@ export const idbConfig = {
       indices: [
         { name: 'content', keyPath: 'content' },
         { name: 'date', keyPath: 'date' },
+        { name: 'profileImage', keyPath: 'profileImage' },
         { name: 'userId', keyPath: 'userId' },
         { name: 'roomId', keyPath: 'roomId' },
       ],

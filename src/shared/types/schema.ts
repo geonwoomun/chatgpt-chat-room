@@ -8,7 +8,7 @@ export type BaseRoomModel = {
 };
 
 export type RoomModel = {
-  roomId: number;
+  id: number;
   apiKey: ApiKeyModel['apiKey'];
 } & BaseRoomModel;
 
@@ -16,9 +16,17 @@ export type CreateRoomModel = {
   apiKey: ApiKeyModel['apiKey'];
 } & BaseRoomModel;
 
-export type MessageModel = {
+export type BaseMessageModel = {
   content: string;
-  date: string;
-  userId: string;
-  roomId: RoomModel['roomId'];
+  date: Date;
+  profileImage?: string;
 };
+
+export type CreatedMessageModel = {
+  userId: string;
+  roomId: RoomModel['id'];
+} & BaseMessageModel;
+
+export type MessageModel = {
+  id: number;
+} & CreatedMessageModel;
