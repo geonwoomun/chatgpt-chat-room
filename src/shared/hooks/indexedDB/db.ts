@@ -6,7 +6,7 @@ function validateStore(db: IDBDatabase, storeName: string) {
   return db.objectStoreNames.contains(storeName);
 }
 
-export function validateBeforeTransaction(db, storeName: string, reject: Function) {
+export function validateBeforeTransaction(db: IDBDatabase, storeName: string, reject: Function) {
   if (!db) {
     reject('Queried before opening connection');
   }
@@ -19,14 +19,14 @@ export function createTransaction(
   db: IDBDatabase,
   dbMode: IDBTransactionMode,
   currentStore: string,
-  resolve,
-  reject?,
-  abort?
+  resolve: (value: any | PromiseLike<any>) => void,
+  reject?: ((this: IDBTransaction, ev: Event) => any) | null,
+  abort?: ((this: IDBTransaction, ev: Event) => any) | null
 ): IDBTransaction {
   let tx: IDBTransaction = db.transaction(currentStore, dbMode);
-  tx.onerror = reject;
+  tx.onerror = reject || null;
   tx.oncomplete = resolve;
-  tx.onabort = abort;
+  tx.onabort = abort || null;
   return tx;
 }
 
@@ -69,7 +69,7 @@ export async function getConnection(config?: IndexedDBConfig): Promise<IDBDataba
   });
 }
 
-export function getActions<T>(currentStore) {
+export function getActions<T>(currentStore: string) {
   return {
     getByID(id: string | number) {
       return new Promise<T>((resolve, reject) => {
@@ -201,7 +201,7 @@ export function getActions<T>(currentStore) {
       });
     },
 
-    openCursor(cursorCallback, keyRange?: IDBKeyRange) {
+    openCursor(cursorCallback: (event: Event) => void, keyRange?: IDBKeyRange) {
       return new Promise<IDBCursorWithValue | void>((resolve, reject) => {
         getConnection()
           .then((db) => {
