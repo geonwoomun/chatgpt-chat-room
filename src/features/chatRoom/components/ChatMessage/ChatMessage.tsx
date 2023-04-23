@@ -1,25 +1,32 @@
+import { createMarginCss } from '@/shared/styles/marginStyle';
+import { MessageModel } from '@/shared/types/schema';
 import { transToMessageFormat } from '@/shared/utils/dateFormat';
-import { Text } from '@chakra-ui/react';
+import { Avatar, Flex, Text, Wrap } from '@chakra-ui/react';
 import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import React from 'react';
 
 type TailPosition = 'left' | 'right';
 type ChatMessageProps = {
-  id: string;
-  content: string;
-  tailPosition: TailPosition;
+  isUserMessage: boolean;
   className?: string;
-  date: Date;
-};
+} & MessageModel;
 
-const ChatMessage = ({ id, content, date, tailPosition, className }: ChatMessageProps) => {
+const ChatMessage = ({ content, date, className, profileImage, userId, isUserMessage }: ChatMessageProps) => {
   return (
     <ChatMessageContainer className={className}>
-      <ChatMessageWrapper tailPosition={tailPosition}>{content}</ChatMessageWrapper>
-      <Text fontSize='sm' color='grey' paddingLeft={3} paddingRight={3}>
-        {transToMessageFormat(date).join(' ')}
-      </Text>
+      {!isUserMessage && <Avatar name={userId} src={profileImage || '/img/default.jpg'} />}
+      <Flex
+        flexDirection='column'
+        css={createMarginCss({ left: isUserMessage ? 0 : 8 })}
+        alignItems={isUserMessage ? 'flex-end' : 'flex-start'}
+      >
+        {!isUserMessage && <div>{userId}</div>}
+        <ChatMessageWrapper tailPosition={isUserMessage ? 'right' : 'left'}>{content}</ChatMessageWrapper>
+        <Text fontSize='sm' color='grey' paddingLeft={3} paddingRight={3}>
+          {transToMessageFormat(date).join(' ')}
+        </Text>
+      </Flex>
     </ChatMessageContainer>
   );
 };
@@ -27,15 +34,17 @@ const ChatMessage = ({ id, content, date, tailPosition, className }: ChatMessage
 export default ChatMessage;
 
 const ChatMessageContainer = styled.div`
-  max-width: 300px;
+  display: flex;
+  max-width: 350px;
 `;
 
 const ChatMessageWrapper = styled.div<{ tailPosition: TailPosition }>`
   position: relative;
-  padding: 10px;
+  padding: 12px;
   background-color: #f1f1f1;
   border-radius: 5px;
-  width: max-content;
+  width: fit-content;
+  max-width: 100%;
 
   ${(props) =>
     props.tailPosition === 'left'

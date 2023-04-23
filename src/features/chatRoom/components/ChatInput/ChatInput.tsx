@@ -15,13 +15,20 @@ const ChatInput = ({ className, onSend }: ChatInputProps) => {
       return;
     }
 
-    onSend(ref.current?.value);
+    onSend(ref.current.value);
+    ref.current.value = '';
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!event.nativeEvent.isComposing && event.key === 'Enter') {
+      handleClickSend();
+    }
   };
 
   return (
     <Container className={className}>
       <InputGroup>
-        <Input ref={ref} placeholder='type user think' size='lg' focusBorderColor='#E2E8F0' />
+        <Input ref={ref} placeholder='type user think' size='lg' focusBorderColor='#E2E8F0' onKeyDown={handleKeyDown} />
         <InputRightElement height='12'>
           <IconButton size='sm' aria-label='send' icon={<AiOutlineSend />} onClick={handleClickSend} />
         </InputRightElement>

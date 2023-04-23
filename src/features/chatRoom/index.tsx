@@ -1,106 +1,60 @@
-import { createMarginCss } from '@/shared/styles/marginStyle';
+import OpenAiInstance from '@/shared/api/openApi';
+import { useIndexedDBStore } from '@/shared/hooks/indexedDB';
+import { CreatedMessageModel, MessageModel, RoomModel } from '@/shared/types/schema';
+import { getAIProfileImageURL } from '@/shared/utils/getAIProfileImage';
 import { Flex } from '@chakra-ui/react';
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import React, { useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useRef, useState } from 'react';
 import ChatInput from './components/ChatInput';
 import ChatMessage from './components/ChatMessage';
 
-const dummyMessages = [
-  {
-    id: '1',
-    message: '안녕하세요. 하이요',
-    date: new Date(),
-    userId: '1234',
-  },
-  {
-    id: '2',
-    message: '오키도키요',
-    date: new Date(),
-    userId: 'zzzz',
-  },
-  {
-    id: '3',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '4',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '5',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '6',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '7',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '8',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '9',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '10',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '11',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '12',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '13',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-  {
-    id: '14',
-    message: '하이하히히히',
-    date: new Date(),
-    userId: 'gzgz',
-  },
-];
-
 const ChatRoom = () => {
-  const chatListRef = useRef<HTMLDivElement>(null);
-  // 채팅방 아이디
-  // 해당 채팅방 아이디에 맞는 채팅방 메시지 정보를 불러오기
-  const profile = 'gzgz';
+  const { query } = useRouter();
+  const roomId = Number(query.roomId || 0);
+  const [roomOccupancy, setRoomOccupancy] = useState(0);
+  const currentUserId = OpenAiInstance.apiKey?.slice(0, 5) || '';
 
-  const handleSendMessage = (value: string) => {
-    console.log(value);
+  const chatListRef = useRef<HTMLDivElement>(null);
+  const [messages, setMessages] = useState<MessageModel[]>([]);
+
+  const { add, getManyByKey } = useIndexedDBStore<MessageModel>('message');
+  const { getByID } = useIndexedDBStore<RoomModel>('rooms');
+
+  const messageToAI = async (value: string) => {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      body: JSON.stringify({
+        text: value,
+        apiKey: OpenAiInstance.apiKey,
+      }),
+    });
+
+    const result = await response.json();
+    const randomGptId = Math.floor(Math.random() * (roomOccupancy - 1));
+
+    const nextMessageInfo: CreatedMessageModel = {
+      content: result.text,
+      date: new Date(),
+      roomId,
+      userId: `chat-gpt-${randomGptId}`,
+      profileImage: getAIProfileImageURL(randomGptId),
+    };
+    const resultId = await add(nextMessageInfo);
+    setMessages((prev) => [...prev, { id: resultId, ...nextMessageInfo }]);
+  };
+
+  const handleSendMessage = async (value: string) => {
+    const nextMessageInfo: CreatedMessageModel = {
+      content: value,
+      date: new Date(),
+      roomId,
+      userId: currentUserId,
+    };
+
+    const createdMessageId = await add(nextMessageInfo);
+    setMessages((prev) => [...prev, { id: createdMessageId, ...nextMessageInfo }]);
+    messageToAI(value);
   };
 
   useEffect(() => {
@@ -109,19 +63,28 @@ const ChatRoom = () => {
     }
 
     chatListRef.current.scrollTo({ top: chatListRef.current.scrollHeight, behavior: 'auto' });
+  }, [messages]);
+
+  useEffect(() => {
+    getManyByKey('roomId', roomId).then((storedMessages) => setMessages(storedMessages));
   }, []);
+
+  useEffect(() => {
+    getByID(roomId).then((value) => {
+      setRoomOccupancy(value?.occupancy || 0);
+    });
+  }, [roomId]);
 
   return (
     <>
       <StyledFlex flexDirection='column' ref={chatListRef}>
-        {dummyMessages.map((messageInfo) => (
+        {messages.map((messageInfo) => (
           <PositionChatMessage
             key={messageInfo.id}
-            id={messageInfo.id}
-            content={messageInfo.message}
-            date={messageInfo.date}
-            tailPosition={messageInfo.userId === profile ? 'right' : 'left'}
-            position={messageInfo.userId === profile ? 'end' : 'start'}
+            {...messageInfo}
+            isUserMessage={messageInfo.userId === currentUserId}
+            position={messageInfo.userId === currentUserId ? 'end' : 'start'}
+            profileImage={messageInfo.profileImage}
           />
         ))}
       </StyledFlex>
@@ -134,9 +97,6 @@ const ChatRoom = () => {
 export default ChatRoom;
 
 const PositionChatMessage = styled(ChatMessage)<{ position: 'start' | 'end' }>`
-  display: flex;
-  flex-direction: column;
-  align-items: ${({ position }) => (position === 'start' ? 'flex-start' : 'flex-end')};
   align-self: ${({ position }) => (position === 'start' ? 'flex-start' : 'flex-end')};
 
   &:not(:first-of-type) {
