@@ -8,7 +8,9 @@ type Response = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Response>) {
   try {
-    const response = await OpenAiInstance.requestPrompt(req.body);
+    const { apiKey, text } = JSON.parse(req.body);
+    OpenAiInstance.setInstance(apiKey);
+    const response = await OpenAiInstance.requestPrompt(text);
     res.status(200).json({ text: response.data.choices[0].text || 'error' });
   } catch (error) {
     console.error(error);
