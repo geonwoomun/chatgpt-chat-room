@@ -1,3 +1,4 @@
-export const transToMessageFormat = (date: Date) => {
-  return [date.toLocaleDateString(), date.toTimeString().split(' ')[0]];
+export const transToMessageFormat = (date: Date | string) => {
+  const targetDate = new Date(date);
+  return [targetDate.toLocaleDateString(), targetDate.toTimeString().split(' ')[0]];
 };
