@@ -7,13 +7,21 @@ import ChatListItem from '../ChatListItem';
 
 type ChatListProps = {
   items: RoomModel[];
+  onSelectUpdate: (selectedRoom: RoomModel) => void;
+  onDelete: (roomId: number) => void;
 };
 
-const ChatList = ({ items }: ChatListProps) => {
+const ChatList = ({ items, onDelete, onSelectUpdate }: ChatListProps) => {
   return (
     <CustomFlexContainer direction='column'>
       {items.map((item) => (
-        <ChatListItem key={item.roomId} {...item} rightComponent={<ChatItemPopover />} />
+        <ChatListItem
+          key={item.id}
+          {...item}
+          rightComponent={
+            <ChatItemPopover onDelete={() => onDelete(item.id)} onSelectUpdate={() => onSelectUpdate(item)} />
+          }
+        />
       ))}
     </CustomFlexContainer>
   );

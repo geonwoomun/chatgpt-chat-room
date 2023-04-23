@@ -8,11 +8,11 @@ type ChatListProps = {
   rightComponent?: ReactNode;
 } & RoomModel;
 
-const ChatListItem = ({ name, occupancy, roomId, rightComponent }: ChatListProps) => {
+const ChatListItem = ({ name, occupancy, id, rightComponent }: ChatListProps) => {
   const router = useRouter();
 
   const handleClickListItem = () => {
-    router.push(`/chat/${roomId}`);
+    router.push(`/chat/${id}`);
   };
 
   return (

@@ -7,7 +7,7 @@ import { Container, IconButton, useDisclosure } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { PropsWithChildren } from 'react';
 import { AiOutlineMessage } from 'react-icons/ai';
-import ChatCreateModal from '../home/components/ChatCreateModal';
+import ChatInfoModal from '../home/components/ChatInfoModal';
 import { BaseHeader } from './components/BaseHeader';
 
 type BaseLayoutProps = {};
@@ -31,7 +31,7 @@ const BaseLayout = ({ children }: PropsWithChildren<BaseLayoutProps>) => {
 
     const createdRoomId = await add(nextRoom);
 
-    setRooms((prev) => [...prev, { roomId: createdRoomId, ...nextRoom }]);
+    setRooms((prev) => [...prev, { id: createdRoomId, ...nextRoom }]);
   };
 
   return (
@@ -45,7 +45,7 @@ const BaseLayout = ({ children }: PropsWithChildren<BaseLayoutProps>) => {
         {children}
       </Container>
 
-      <ChatCreateModal isOpen={isOpen} onClose={onClose} onConfirm={handleConfirm} />
+      <ChatInfoModal isOpen={isOpen} onClose={onClose} onConfirm={handleConfirm} />
     </>
   );
 };
